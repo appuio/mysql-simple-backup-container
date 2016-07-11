@@ -5,7 +5,8 @@ USER root
 RUN yum -y install python \
     python-devel \
     python-pip \
-    mercurial && yum clean all
+    mercurial \
+    mysql && yum clean all
 
 # Install dev cron
 RUN pip install -e hg+https://bitbucket.org/dbenamy/devcron#egg=devcron
