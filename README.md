@@ -17,6 +17,25 @@ $ oc new-app https://github.com/appuio/mysql-simple-backup-container.git --strat
 $ oc env dc mysql-simple-backup-container -e MYSQL_USER=user -e MYSQL_PASSWORD=pw -e MYSQL_SERVICE_HOST=mysql -e MYSQL_DATABASE=database -e BACKUP_DATA_DIR=/tmp/ -e BACKUP_KEEP=5 -e BACKUP_MINUTE=10 -e BACKUP_HOUR=11,23
 ```
 
+#### Template
+
+Use the following commands to create a template and instanciate the backup container.
+
+**without persistent storage attached**
+```
+$ oc create -f template-ephemeral.json
+$ oc new-app mysql-backup-ephemeral -p MYSQL_DATABASE=database -p MYSQL_USER=user -p MYSQL_PASSWORD=pw
+
+```
+
+**With persistent storage**
+```
+$ oc create -f template-persistent.json
+$ oc new-app mysql-backup-persistent -p MYSQL_DATABASE=database -p MYSQL_USER=user -p MYSQL_PASSWORD=pw -p VOLUME_CAPACITY=2GBi
+
+```
+
+
 #### Configuration
 
 set the following Envs

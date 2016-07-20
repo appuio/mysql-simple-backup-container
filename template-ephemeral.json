@@ -1,0 +1,230 @@
+{
+    "kind": "Template",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "mysql-backup-ephemeral",
+        "creationTimestamp": null
+    },
+    "objects": [
+        {
+            "kind": "BuildConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "mysql-simple-backup-container",
+                "creationTimestamp": null,
+                "labels": {
+                    "app": "mysql-simple-backup-container"
+                }
+            },
+            "spec": {
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "type": "ImageChange",
+                        "imageChange": {}
+                    }
+                ],
+                "source": {
+                    "type": "Git",
+                    "git": {
+                        "uri": "https://github.com/appuio/mysql-simple-backup-container.git"
+                    },
+                    "secrets": null
+                },
+                "strategy": {
+                    "type": "Docker"
+                },
+                "output": {
+                    "to": {
+                        "kind": "ImageStreamTag",
+                        "name": "mysql-simple-backup-container:latest"
+                    }
+                },
+                "resources": {},
+                "postCommit": {}
+            },
+            "status": {
+                "lastVersion": 0
+            }
+        },
+        {
+            "kind": "ImageStream",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "mysql-simple-backup-container",
+                "generation": 1,
+                "creationTimestamp": null,
+                "labels": {
+                    "app": "mysql-simple-backup-container"
+                }
+            },
+            "status": {
+                "dockerImageRepository": ""
+            }
+        },
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "mysql-simple-backup-container",
+                "creationTimestamp": null,
+                "labels": {
+                    "app": "mysql-simple-backup-container"
+                }
+            },
+            "spec": {
+                "strategy": {
+                    "type": "Rolling",
+                    "rollingParams": {
+                        "updatePeriodSeconds": 1,
+                        "intervalSeconds": 1,
+                        "timeoutSeconds": 600,
+                        "maxUnavailable": "25%",
+                        "maxSurge": "25%"
+                    },
+                    "resources": {}
+                },
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "type": "ImageChange",
+                        "imageChangeParams": {
+                            "automatic": true,
+                            "containerNames": [
+                                "mysql-simple-backup-container"
+                            ],
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "name": "mysql-simple-backup-container:latest"
+                            }
+                        }
+                    }
+                ],
+                "replicas": 1,
+                "test": false,
+                "selector": {
+                    "app": "mysql-simple-backup-container",
+                    "deploymentconfig": "mysql-simple-backup-container"
+                },
+                "template": {
+                    "metadata": {
+                        "creationTimestamp": null,
+                        "labels": {
+                            "app": "mysql-simple-backup-container",
+                            "deploymentconfig": "mysql-simple-backup-container"
+                        }
+                    },
+                    "spec": {
+                        "volumes": [
+                            {
+                                "name": "backup-data",
+                                "emptyDir": {}
+                            }
+                        ],
+                        "containers": [
+                            {
+                                "name": "mysql-simple-backup-container",
+                                "image": "mysql-simple-backup-container",
+                                "env": [
+                                    {
+                                        "name": "MYSQL_USER",
+                                        "value": "${MYSQL_USER}"
+                                    },
+                                    {
+                                        "name": "MYSQL_PASSWORD",
+                                        "value": "${MYSQL_PASSWORD}"
+                                    },
+                                    {
+                                        "name": "MYSQL_SERVICE_HOST",
+                                        "value": "${MYSQL_SERVICE_HOST}"
+                                    },
+                                    {
+                                        "name": "MYSQL_DATABASE",
+                                        "value": "${MYSQL_DATABASE}"
+                                    },
+                                    {
+                                        "name": "BACKUP_DATA_DIR",
+                                        "value": "${BACKUP_DATA_DIR}"
+                                    },
+                                    {
+                                        "name": "BACKUP_KEEP",
+                                        "value": "${BACKUP_KEEP}"
+                                    },
+                                    {
+                                        "name": "BACKUP_MINUTE",
+                                        "value": "${BACKUP_MINUTE}"
+                                    },
+                                    {
+                                        "name": "BACKUP_HOUR",
+                                        "value": "${BACKUP_HOUR}"
+                                    }
+                                ],
+                                "resources": {},
+                                "volumeMounts": [
+                                    {
+                                        "name": "backup-data",
+                                        "mountPath": "${BACKUP_DATA_DIR}"
+                                    }
+                                ],
+                                "terminationMessagePath": "/dev/termination-log",
+                                "imagePullPolicy": "Always"
+                            }
+                        ],
+                        "restartPolicy": "Always",
+                        "terminationGracePeriodSeconds": 30,
+                        "dnsPolicy": "ClusterFirst",
+                        "securityContext": {}
+                    }
+                }
+            },
+            "status": {}
+        }
+
+    ],
+    "parameters": [
+        {
+            "name": "MYSQL_SERVICE_HOST",
+            "description": "Database host name",
+            "value": "mysql"
+        },
+        {
+            "name": "MYSQL_DATABASE",
+            "description": "Database name",
+            "value": "database"
+        },
+        {
+            "name": "MYSQL_USER",
+            "description": "Database user name",
+            "value": "user"
+        },
+        {
+            "name": "MYSQL_PASSWORD",
+            "description": "Database user password",
+            "value": "pw"
+        },
+        {
+            "name": "BACKUP_DATA_DIR",
+            "description": "where to store the Backups, typically this directory would be a persistent Volume",
+            "value": "/opt/app-root/backup/"
+        },
+        {
+            "name": "BACKUP_KEEP",
+            "description": "how many Backups are kept",
+            "value": "5"
+        },
+        {
+            "name": "BACKUP_MINUTE",
+            "description": "cron Minute (eg. 10) ",
+            "value": "10"
+        },
+        {
+            "name": "BACKUP_HOUR",
+            "description": " cron Hour (eg. 11,23) every day at 11am and 11pm",
+            "value": "11,23"
+        }
+    ]
+}
