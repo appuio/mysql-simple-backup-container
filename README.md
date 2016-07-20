@@ -17,6 +17,13 @@ $ oc new-app https://github.com/appuio/mysql-simple-backup-container.git --strat
 $ oc env dc mysql-simple-backup-container -e MYSQL_USER=user -e MYSQL_PASSWORD=pw -e MYSQL_SERVICE_HOST=mysql -e MYSQL_DATABASE=database -e BACKUP_DATA_DIR=/tmp/ -e BACKUP_KEEP=5 -e BACKUP_MINUTE=10 -e BACKUP_HOUR=11,23
 ```
 
+#### Restore Database
+```
+$ oc get pods
+$ oc rsh mysql-simple-backup-container-#-#####
+$ gunzip < /opt/app-root/backup/dump-yyyy-mm-dd-hh-mm.sql.gz | mysql -h mysql -u user -p database
+```
+
 #### Template
 
 Use the following commands to create a template and instanciate the backup container.
@@ -46,5 +53,5 @@ set the following Envs
 * MYSQL_DATABASE, the database you want to backup
 * BACKUP_DATA_DIR, where to store the Backups, typically this directory would be a persistent Volume
 * BACKUP_KEEP, how many Backups are kept
-* BACKUP_MINUTE, cron Minute (eg. 10) 
+* BACKUP_MINUTE, cron Minute (eg. 10)
 * BACKUP_HOUR, cron Hour (eg. 11,23) every day at 11am and 11pm
