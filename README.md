@@ -21,7 +21,7 @@ $ oc env dc mysql-simple-backup-container -e MYSQL_USER=user -e MYSQL_PASSWORD=p
 ```
 $ oc get pods
 $ oc rsh mysql-simple-backup-container-#-#####
-$ gunzip < /opt/app-root/backup/dump-yyyy-mm-dd-hh-mm.sql.gz | mysql -h mysql -u user -p database
+$ gunzip < /opt/app-root/backup/dump-yyyy-mm-dd-hh-mm.sql.gz | mysql -h $MYSQL_SERVICE_HOST -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE
 ```
 
 #### Template
