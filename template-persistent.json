@@ -26,49 +26,6 @@
             "status": {}
         },
         {
-            "kind": "BuildConfig",
-            "apiVersion": "v1",
-            "metadata": {
-                "name": "mysql-simple-backup-container",
-                "creationTimestamp": null,
-                "labels": {
-                    "app": "mysql-simple-backup-container"
-                }
-            },
-            "spec": {
-                "triggers": [
-                    {
-                        "type": "ConfigChange"
-                    },
-                    {
-                        "type": "ImageChange",
-                        "imageChange": {}
-                    }
-                ],
-                "source": {
-                    "type": "Git",
-                    "git": {
-                        "uri": "https://github.com/appuio/mysql-simple-backup-container.git"
-                    },
-                    "secrets": null
-                },
-                "strategy": {
-                    "type": "Docker"
-                },
-                "output": {
-                    "to": {
-                        "kind": "ImageStreamTag",
-                        "name": "mysql-simple-backup-container:latest"
-                    }
-                },
-                "resources": {},
-                "postCommit": {}
-            },
-            "status": {
-                "lastVersion": 0
-            }
-        },
-        {
             "kind": "ImageStream",
             "apiVersion": "v1",
             "metadata": {
@@ -203,6 +160,49 @@
                 }
             },
             "status": {}
+        },
+        {
+            "kind": "BuildConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "mysql-simple-backup-container",
+                "creationTimestamp": null,
+                "labels": {
+                    "app": "mysql-simple-backup-container"
+                }
+            },
+            "spec": {
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "type": "ImageChange",
+                        "imageChange": {}
+                    }
+                ],
+                "source": {
+                    "type": "Git",
+                    "git": {
+                        "uri": "https://github.com/appuio/mysql-simple-backup-container.git"
+                    },
+                    "secrets": null
+                },
+                "strategy": {
+                    "type": "Docker"
+                },
+                "output": {
+                    "to": {
+                        "kind": "ImageStreamTag",
+                        "name": "mysql-simple-backup-container:latest"
+                    }
+                },
+                "resources": {},
+                "postCommit": {}
+            },
+            "status": {
+                "lastVersion": 0
+            }
         }
 
     ],
