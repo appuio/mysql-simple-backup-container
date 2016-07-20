@@ -15,9 +15,8 @@ RUN pip install -e hg+https://bitbucket.org/dbenamy/devcron#egg=devcron
 
 WORKDIR /opt/app-root/src
 
-RUN /bin/sh -c 'echo "$BACKUP_MINUTE $BACKUP_HOUR * * * /opt/app-root/src/job.sh" > crontab'
-ADD ./bin/job.sh job.sh
+ADD ./bin ./bin
 
 USER 1001
 
-CMD ["devcron.py", "crontab"]
+CMD ./bin/run.sh
