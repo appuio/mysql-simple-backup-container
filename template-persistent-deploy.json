@@ -1,0 +1,206 @@
+{
+    "kind": "Template",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "mysql-backup-persistent",
+        "creationTimestamp": null
+    },
+    "objects": [
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "mysql-backup-persistent",
+                "creationTimestamp": null,
+                "labels": {
+                    "app": "${APP_NAME}"
+                }
+            },
+            "spec": {
+                "strategy": {
+                    "type": "Rolling",
+                    "rollingParams": {
+                        "updatePeriodSeconds": 1,
+                        "intervalSeconds": 1,
+                        "timeoutSeconds": 600,
+                        "maxUnavailable": "25%",
+                        "maxSurge": "25%"
+                    },
+                    "resources": {}
+                },
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "type": "ImageChange",
+                        "imageChangeParams": {
+                            "automatic": true,
+                            "containerNames": [
+                                "mysql-simple-backup-container"
+                            ],
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "name": "172.30.1.1:5000/openshift/mysql-simple-backup-container"
+                            }
+                        }
+                    }
+                ],
+                "replicas": 1,
+                "test": false,
+                "selector": {
+                    "app": "${APP_NAME}",
+                    "deploymentconfig": "mysql-backup-persistent"
+                },
+                "template": {
+                    "metadata": {
+                        "creationTimestamp": null,
+                        "labels": {
+                            "app": "${APP_NAME}",
+                            "deploymentconfig": "backup"
+                        }
+                    },
+                    "spec": {
+                        "volumes": [
+                            {
+                                "name": "backup-data",
+                                "persistentVolumeClaim": {
+                                    "claimName": "backuppvc"
+                                }
+                            }
+                        ],
+                        "containers": [
+                            {
+                                "name": "${APP_NAME}",
+                                "image": "172.30.1.1:5000/openshift/mysql-simple-backup-container",
+                                "env": [
+                                    {
+                                        "name": "MYSQL_USER",
+                                        "value": "${MYSQL_USER}"
+                                    },
+                                    {
+                                        "name": "MYSQL_PASSWORD",
+                                        "value": "${MYSQL_PASSWORD}"
+                                    },
+                                    {
+                                        "name": "MYSQL_SERVICE_HOST",
+                                        "value": "${MYSQL_SERVICE_HOST}"
+                                    },
+                                    {
+                                        "name": "MYSQL_DATABASE",
+                                        "value": "${MYSQL_DATABASE}"
+                                    },
+                                    {
+                                        "name": "BACKUP_DATA_DIR",
+                                        "value": "${BACKUP_DATA_DIR}"
+                                    },
+                                    {
+                                        "name": "BACKUP_KEEP",
+                                        "value": "${BACKUP_KEEP}"
+                                    },
+                                    {
+                                        "name": "BACKUP_MINUTE",
+                                        "value": "${BACKUP_MINUTE}"
+                                    },
+                                    {
+                                        "name": "BACKUP_HOUR",
+                                        "value": "${BACKUP_HOUR}"
+                                    }
+                                ],
+                                "resources": {},
+                                "volumeMounts": [
+                                    {
+                                        "name": "backup-data",
+                                        "mountPath": "${BACKUP_DATA_DIR}"
+                                    }
+                                ],
+                                "terminationMessagePath": "/dev/termination-log",
+                                "imagePullPolicy": "Always"
+                            }
+                        ],
+                        "restartPolicy": "Always",
+                        "terminationGracePeriodSeconds": 30,
+                        "dnsPolicy": "ClusterFirst",
+                        "securityContext": {}
+                    }
+                }
+            },
+            "status": {}
+        },
+        {
+            "kind": "PersistentVolumeClaim",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "backuppvc",
+                "creationTimestamp": null
+            },
+            "spec": {
+                "accessModes": [
+                    "ReadWriteMany"
+                ],
+                "resources": {
+                    "requests": {
+                        "storage": "${VOLUME_CAPACITY_BACKUP}"
+                    }
+                }
+            },
+            "status": {}
+        }
+    ],
+    "parameters": [
+        {
+            "name": "MYSQL_SERVICE_HOST",
+            "description": "Database host name",
+            "value": "mysql"
+        },
+        {
+            "name": "MYSQL_DATABASE",
+            "description": "Database name",
+            "value": "database"
+        },
+        {
+            "name": "MYSQL_USER",
+            "description": "Database user name",
+            "value": "user"
+        },
+        {
+            "name": "MYSQL_PASSWORD",
+            "description": "Database user password",
+            "value": "pw"
+        },
+        {
+            "name": "BACKUP_DATA_DIR",
+            "description": "where to store the Backups, typically this directory would be a persistent Volume",
+            "value": "/opt/app-root/backup/"
+        },
+        {
+            "name": "BACKUP_KEEP",
+            "description": "how many Backups are kept",
+            "value": "5"
+        },
+        {
+            "name": "BACKUP_MINUTE",
+            "description": "cron Minute (eg. 10) ",
+            "value": "10"
+        },
+        {
+            "name": "BACKUP_HOUR",
+            "description": " cron Hour (eg. 11,23) every day at 11am and 11pm",
+            "value": "11,23"
+        },
+        {
+            "name": "VOLUME_CAPACITY_BACKUP",
+            "displayName": "Volume Capacity",
+            "description": "Volume space available for backups, e.g. 512Mi, 2Gi.",
+            "value": "1Gi",
+            "required": true
+        },
+        {
+            "name": "APP_NAME",
+            "displayName": "App Name",
+            "description": "App name for internal openshift labels",
+            "value": "example-app",
+            "required": true
+        }
+    ]
+}
