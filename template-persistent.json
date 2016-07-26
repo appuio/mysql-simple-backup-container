@@ -7,47 +7,13 @@
     },
     "objects": [
         {
-            "kind": "PersistentVolumeClaim",
-            "apiVersion": "v1",
-            "metadata": {
-                "name": "backuppvc",
-                "creationTimestamp": null
-            },
-            "spec": {
-                "accessModes": [
-                    "ReadWriteMany"
-                ],
-                "resources": {
-                    "requests": {
-                        "storage": "${VOLUME_CAPACITY}"
-                    }
-                }
-            },
-            "status": {}
-        },
-        {
-            "kind": "ImageStream",
-            "apiVersion": "v1",
-            "metadata": {
-                "name": "mysql-simple-backup-container",
-                "generation": 1,
-                "creationTimestamp": null,
-                "labels": {
-                    "app": "mysql-simple-backup-container"
-                }
-            },
-            "status": {
-                "dockerImageRepository": ""
-            }
-        },
-        {
             "kind": "DeploymentConfig",
             "apiVersion": "v1",
             "metadata": {
-                "name": "mysql-simple-backup-container",
+                "name": "mysql-backup-persistent",
                 "creationTimestamp": null,
                 "labels": {
-                    "app": "mysql-simple-backup-container"
+                    "app": "${APP_NAME}"
                 }
             },
             "spec": {
@@ -75,6 +41,7 @@
                             ],
                             "from": {
                                 "kind": "ImageStreamTag",
+                                "namespace": "openshift",
                                 "name": "mysql-simple-backup-container:latest"
                             }
                         }
@@ -83,15 +50,15 @@
                 "replicas": 1,
                 "test": false,
                 "selector": {
-                    "app": "mysql-simple-backup-container",
-                    "deploymentconfig": "mysql-simple-backup-container"
+                    "app": "${APP_NAME}",
+                    "deploymentconfig": "mysql-backup-persistent"
                 },
                 "template": {
                     "metadata": {
                         "creationTimestamp": null,
                         "labels": {
-                            "app": "mysql-simple-backup-container",
-                            "deploymentconfig": "mysql-simple-backup-container"
+                            "app": "${APP_NAME}",
+                            "deploymentconfig": "backup"
                         }
                     },
                     "spec": {
@@ -105,8 +72,8 @@
                         ],
                         "containers": [
                             {
-                                "name": "mysql-simple-backup-container",
-                                "image": "mysql-simple-backup-container",
+                                "name": "${APP_NAME}",
+                                "image": "172.30.1.1:5000/openshift/mysql-simple-backup-container",
                                 "env": [
                                     {
                                         "name": "MYSQL_USER",
@@ -162,49 +129,24 @@
             "status": {}
         },
         {
-            "kind": "BuildConfig",
+            "kind": "PersistentVolumeClaim",
             "apiVersion": "v1",
             "metadata": {
-                "name": "mysql-simple-backup-container",
-                "creationTimestamp": null,
-                "labels": {
-                    "app": "mysql-simple-backup-container"
-                }
+                "name": "backuppvc",
+                "creationTimestamp": null
             },
             "spec": {
-                "triggers": [
-                    {
-                        "type": "ConfigChange"
-                    },
-                    {
-                        "type": "ImageChange",
-                        "imageChange": {}
-                    }
+                "accessModes": [
+                    "ReadWriteMany"
                 ],
-                "source": {
-                    "type": "Git",
-                    "git": {
-                        "uri": "https://github.com/appuio/mysql-simple-backup-container.git"
-                    },
-                    "secrets": null
-                },
-                "strategy": {
-                    "type": "Docker"
-                },
-                "output": {
-                    "to": {
-                        "kind": "ImageStreamTag",
-                        "name": "mysql-simple-backup-container:latest"
+                "resources": {
+                    "requests": {
+                        "storage": "${VOLUME_CAPACITY_BACKUP}"
                     }
-                },
-                "resources": {},
-                "postCommit": {}
+                }
             },
-            "status": {
-                "lastVersion": 0
-            }
+            "status": {}
         }
-
     ],
     "parameters": [
         {
@@ -248,10 +190,17 @@
             "value": "11,23"
         },
         {
-            "name": "VOLUME_CAPACITY",
+            "name": "VOLUME_CAPACITY_BACKUP",
             "displayName": "Volume Capacity",
             "description": "Volume space available for backups, e.g. 512Mi, 2Gi.",
             "value": "1Gi",
+            "required": true
+        },
+        {
+            "name": "APP_NAME",
+            "displayName": "App Name",
+            "description": "App name for internal openshift labels",
+            "value": "mysql-simple-backup-container",
             "required": true
         }
     ]

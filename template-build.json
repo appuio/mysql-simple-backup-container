@@ -2,7 +2,7 @@
     "kind": "Template",
     "apiVersion": "v1",
     "metadata": {
-        "name": "mysql-backup-persistent",
+        "name": "mysql-backup-persistent-build",
         "creationTimestamp": null
     },
     "objects": [

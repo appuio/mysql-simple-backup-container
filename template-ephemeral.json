@@ -7,28 +7,13 @@
     },
     "objects": [
         {
-            "kind": "ImageStream",
-            "apiVersion": "v1",
-            "metadata": {
-                "name": "mysql-simple-backup-container",
-                "generation": 1,
-                "creationTimestamp": null,
-                "labels": {
-                    "app": "mysql-simple-backup-container"
-                }
-            },
-            "status": {
-                "dockerImageRepository": ""
-            }
-        },
-        {
             "kind": "DeploymentConfig",
             "apiVersion": "v1",
             "metadata": {
-                "name": "mysql-simple-backup-container",
+                "name": "mysql-backup-ephemeral",
                 "creationTimestamp": null,
                 "labels": {
-                    "app": "mysql-simple-backup-container"
+                    "app": "${APP_NAME}"
                 }
             },
             "spec": {
@@ -56,6 +41,7 @@
                             ],
                             "from": {
                                 "kind": "ImageStreamTag",
+                                "namespace": "openshift",
                                 "name": "mysql-simple-backup-container:latest"
                             }
                         }
@@ -64,15 +50,15 @@
                 "replicas": 1,
                 "test": false,
                 "selector": {
-                    "app": "mysql-simple-backup-container",
-                    "deploymentconfig": "mysql-simple-backup-container"
+                    "app": "${APP_NAME}",
+                    "deploymentconfig": "mysql-backup-ephemeral"
                 },
                 "template": {
                     "metadata": {
                         "creationTimestamp": null,
                         "labels": {
-                            "app": "mysql-simple-backup-container",
-                            "deploymentconfig": "mysql-simple-backup-container"
+                            "app": "${APP_NAME}",
+                            "deploymentconfig": "backup"
                         }
                     },
                     "spec": {
@@ -84,8 +70,8 @@
                         ],
                         "containers": [
                             {
-                                "name": "mysql-simple-backup-container",
-                                "image": "mysql-simple-backup-container",
+                                "name": "${APP_NAME}",
+                                "image": "172.30.1.1:5000/openshift/mysql-simple-backup-container",
                                 "env": [
                                     {
                                         "name": "MYSQL_USER",
@@ -139,51 +125,7 @@
                 }
             },
             "status": {}
-        },
-        {
-            "kind": "BuildConfig",
-            "apiVersion": "v1",
-            "metadata": {
-                "name": "mysql-simple-backup-container",
-                "creationTimestamp": null,
-                "labels": {
-                    "app": "mysql-simple-backup-container"
-                }
-            },
-            "spec": {
-                "triggers": [
-                    {
-                        "type": "ConfigChange"
-                    },
-                    {
-                        "type": "ImageChange",
-                        "imageChange": {}
-                    }
-                ],
-                "source": {
-                    "type": "Git",
-                    "git": {
-                        "uri": "https://github.com/appuio/mysql-simple-backup-container.git"
-                    },
-                    "secrets": null
-                },
-                "strategy": {
-                    "type": "Docker"
-                },
-                "output": {
-                    "to": {
-                        "kind": "ImageStreamTag",
-                        "name": "mysql-simple-backup-container:latest"
-                    }
-                },
-                "resources": {},
-                "postCommit": {}
-            },
-            "status": {
-                "lastVersion": 0
-            }
         }
-
     ],
     "parameters": [
         {
@@ -225,6 +167,13 @@
             "name": "BACKUP_HOUR",
             "description": " cron Hour (eg. 11,23) every day at 11am and 11pm",
             "value": "11,23"
+        },
+        {
+            "name": "APP_NAME",
+            "displayName": "App Name",
+            "description": "App name for internal openshift labels",
+            "value": "mysql-simple-backup-container",
+            "required": true
         }
     ]
 }
