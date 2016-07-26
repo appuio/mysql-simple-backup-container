@@ -41,7 +41,8 @@
                             ],
                             "from": {
                                 "kind": "ImageStreamTag",
-                                "name": "172.30.1.1:5000/openshift/mysql-simple-backup-container"
+                                "namespace": "openshift",
+                                "name": "mysql-simple-backup-container"
                             }
                         }
                     }
@@ -199,7 +200,7 @@
             "name": "APP_NAME",
             "displayName": "App Name",
             "description": "App name for internal openshift labels",
-            "value": "example-app",
+            "value": "mysql-simple-backup-container",
             "required": true
         }
     ]
