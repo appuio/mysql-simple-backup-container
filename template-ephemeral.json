@@ -165,8 +165,8 @@
         },
         {
             "name": "BACKUP_HOUR",
-            "description": " cron Hour (eg. 11,23) every day at 11am and 11pm",
-            "value": "11,23"
+            "description": "cron Hour (eg. 11,19) every day at 11am and 7pm",
+            "value": "11,19"
         },
         {
             "name": "APP_NAME",
