@@ -141,7 +141,7 @@
                 ],
                 "resources": {
                     "requests": {
-                        "storage": "${VOLUME_CAPACITY_BACKUP}"
+                        "storage": "${BACKUP_VOLUME_CAPACITY}"
                     }
                 }
             },
