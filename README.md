@@ -29,7 +29,7 @@ $ gunzip < /opt/app-root/backup/dump-yyyy-mm-dd-hh-mm.sql.gz | mysql -h $MYSQL_S
 $ oc new-app -f template-build.json -n openshift
 ```
 
-Use the following commands to instanciate the backup container.
+Use the following commands to instantiate the backup container.
 
 **Without persistent storage attached**
 ```
@@ -39,7 +39,7 @@ $ oc new-app -f template-ephemeral.json -p MYSQL_DATABASE=database -p MYSQL_USER
 
 **With persistent storage**
 ```
-$ oc new-app -f template-persistent.json -p MYSQL_DATABASE=database -p MYSQL_USER=user -p MYSQL_PASSWORD=pw -p VOLUME_CAPACITY=2GBi
+$ oc new-app -f template-persistent.json -p MYSQL_DATABASE=database -p MYSQL_USER=user -p MYSQL_PASSWORD=pw -p VOLUME_CAPACITY=2Gi
 
 ```
 
