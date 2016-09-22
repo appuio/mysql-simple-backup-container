@@ -1,5 +1,5 @@
 #!/bin/sh
-DATE=`date +%Y-%m-%d-%H-%M`
+DATE=$(date +%Y-%m-%d-%H-%M)
 dump=$(mysqldump --user=$MYSQL_USER --password=$MYSQL_PASSWORD --host=$MYSQL_SERVICE_HOST $MYSQL_DATABASE)
 
 if [ $? -ne 0 ]; then
