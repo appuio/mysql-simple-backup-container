@@ -39,7 +39,7 @@ $ oc new-app -f template-ephemeral.json -p MYSQL_DATABASE=database -p MYSQL_USER
 
 **With persistent storage**
 ```
-$ oc new-app -f template-persistent.json -p MYSQL_DATABASE=database -p MYSQL_USER=user -p MYSQL_PASSWORD=pw -p VOLUME_CAPACITY=2Gi
+$ oc new-app -f template-persistent.json -p MYSQL_DATABASE=database -p MYSQL_USER=user -p MYSQL_PASSWORD=pw -p BACKUP_VOLUME_CAPACITY=2Gi
 
 ```
 
@@ -56,3 +56,4 @@ set the following Envs
 * BACKUP_KEEP, how many Backups are kept
 * BACKUP_MINUTE, cron Minute (eg. 10)
 * BACKUP_HOUR, cron Hour (eg. 11,23) every day at 11am and 11pm
+* BACKUP_VOLUME_CAPACITY, size of backup persistent volume (only needed when persistent storage template was used)

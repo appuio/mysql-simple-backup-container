@@ -190,7 +190,7 @@
             "value": "11,19"
         },
         {
-            "name": "VOLUME_CAPACITY_BACKUP",
+            "name": "BACKUP_VOLUME_CAPACITY",
             "displayName": "Volume Capacity",
             "description": "Volume space available for backups, e.g. 512Mi, 2Gi.",
             "value": "1Gi",
