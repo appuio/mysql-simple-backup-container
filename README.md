@@ -1,50 +1,35 @@
 # APPUiO Simple MySQL Backup Pod
 
+## How to deploy the backup container
+Before executing the following commands make sure that you are logged into Openshift via the commandline (`oc login`) and using the correct project (`oc project`). The mysql service doesn't have to be located in the same project, if you can access it remotely.
 
-## How to deploy
-
-### Create New OpenShift Project
-```
-$ oc project mymysqlproject
-```
-
-### Create Application and configure dc
 ```
 $ oc new-app https://github.com/appuio/mysql-simple-backup-container.git --strategy=docker
 
-$ oc env dc mysql-simple-backup-container -e MYSQL_USER=user -e MYSQL_PASSWORD=pw -e MYSQL_SERVICE_HOST=mysql -e MYSQL_DATABASE=database -e BACKUP_DATA_DIR=/tmp/ -e BACKUP_KEEP=5 -e BACKUP_MINUTE=10 -e BACKUP_HOUR=11,23
+$ oc env dc mysql-simple-backup-container -e MYSQL_USER=user -e MYSQL_PASSWORD=pw -e MYSQL_SERVICE_HOST=mysql -e MYSQL_DATABASE=database -e BACKUP_DATA_DIR=/tmp/ -e BACKUP_KEEP=5 -e BACKUP_MINUTE=10 -e BACKUP_HOUR=11
 ```
+**Note:** For values with comma (eg. 11,23) you will have to edit the dc with vim: `oc edit dc mysql-simple-backup-container`
 
-### Restore Database
+## Restore Database
 ```
 $ oc get pods
 $ oc rsh mysql-simple-backup-container-#-#####
 $ gunzip < /opt/app-root/backup/dump-yyyy-mm-dd-hh-mm.sql.gz | mysql -h $MYSQL_SERVICE_HOST -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE
 ```
 
-### Template
+## Alternative deploy variant (single build, multiple deploys)
+If you have a few projects that require mysql backups it makes sense to have a central build. The following command only builds the image in the openshift namespace.
 
 **Create the central image build**
 ```
 $ oc new-app -f template-build.json -n openshift
 ```
-
-Use the following commands to instantiate the backup container.
-
-**Without persistent storage attached**
-```
-$ oc new-app -f template-ephemeral.json -p MYSQL_DATABASE=database -p MYSQL_USER=user -p MYSQL_PASSWORD=pw
-
-```
-
-**With persistent storage**
+Since the image is already built, you can now deploy it multiple times in different projects and reference the same build. This allows you to update one central build and trigger multiple redeploys. Make sure you are in the correct project and run the following command.
 ```
 $ oc new-app -f template-persistent.json -p MYSQL_DATABASE=database -p MYSQL_USER=user -p MYSQL_PASSWORD=pw -p BACKUP_VOLUME_CAPACITY=2Gi
-
 ```
 
-
-### Configuration
+## Configuration
 
 set the following Envs
 
