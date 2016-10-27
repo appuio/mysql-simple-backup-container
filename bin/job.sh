@@ -1,13 +1,13 @@
 #!/bin/sh
 DATE=$(date +%Y-%m-%d-%H-%M)
-dump=$(mysqldump --user=$MYSQL_USER --password=$MYSQL_PASSWORD --host=$MYSQL_SERVICE_HOST $MYSQL_DATABASE)
+dump="$(mysqldump --user=$MYSQL_USER --password=$MYSQL_PASSWORD --host=$MYSQL_SERVICE_HOST $MYSQL_DATABASE)"
 
 if [ $? -ne 0 ]; then
     echo "mysqldump not successful: ${DATE}"
     exit 1
 fi
 
-echo $dump | gzip > $BACKUP_DATA_DIR/dump-${DATE}.sql.gz
+echo -e "$dump" | gzip > $BACKUP_DATA_DIR/dump-${DATE}.sql.gz
 
 if [ $? -eq 0 ]; then
     echo "backup created: ${DATE}"
