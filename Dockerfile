@@ -2,7 +2,7 @@ FROM openshift/base-centos7
 
 USER root
 
-ENV BACKUP_DATA_DIR=/tmp BACKUP_KEEP=2 BACKUP_MINUTE=* BACKUP_HOUR=*
+ENV BACKUP_KEEP=2 BACKUP_MINUTE=0 BACKUP_HOUR=*
 
 RUN yum -y install epel-release && yum update -y
 RUN yum -y install python \
