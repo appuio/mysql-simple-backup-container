@@ -6,9 +6,7 @@ Before executing the following commands make sure that you are logged into Opens
 ```
 $ oc new-app https://github.com/appuio/mysql-simple-backup-container.git --strategy=docker
 
-$ oc env dc mysql-simple-backup-container -e MYSQL_USER=user -e MYSQL_PASSWORD=pw -e MYSQL_SERVICE_HOST=mysql -e MYSQL_DATABASE=database -e BACKUP_DATA_DIR=/tmp/ -e BACKUP_KEEP=5 -e BACKUP_MINUTE=10 -e BACKUP_HOUR=11
-
-$ oc rollout latest mysql-simple-backup-container
+$ oc set env dc mysql-simple-backup-container -e MYSQL_USER=user -e MYSQL_PASSWORD=pw -e MYSQL_SERVICE_HOST=mysql -e MYSQL_DATABASE=database -e BACKUP_DATA_DIR=/tmp/ -e BACKUP_KEEP=5 -e BACKUP_MINUTE=10 -e BACKUP_HOUR=11
 ```
 **Note:** For values with comma (eg. 11,23) you will have to edit the dc with vim: `oc edit dc mysql-simple-backup-container`
 
