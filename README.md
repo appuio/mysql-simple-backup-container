@@ -1,3 +1,7 @@
+# Deprecated
+
+!!! Use https://github.com/appuio/mariadb-backup-cronjob instead!!!
+
 # APPUiO Simple MySQL Backup Pod
 
 ## How to deploy the backup container
